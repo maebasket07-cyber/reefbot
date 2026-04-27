@@ -1,0 +1,16 @@
+codespaces-blank/
+├─ index.html
+└─ assets/
+   ├─ images/
+   │  ├─ hero-reefbot.png
+   │  ├─ ecosystem.png
+   │  ├─ facility.png
+   │  ├─ warehouse.png
+   │  ├─ floorplan-hq.png
+   │  └─ floorplan-prod.png
+   └─ logos/
+      ├─ reefbot-logo.png
+      ├─ client-wwf.png
+      ├─ client-ifremer.png
+      └─ client-axa.png
+    

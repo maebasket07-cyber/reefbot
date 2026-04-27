@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReefBot — Restoring the ocean, one reef at a time.</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --blue-light: #76AAFF;
+        --yellow: #FFC33C;
+        --blue-dark: #1153FF;
+        --gold: #ECE0A7;
+        --ocean-deep: #0F1B2E;
+        --ocean-mid: #152340;
+        --ocean-surface: #1A2A42;
+        --text-primary: #FFFFFF;
+        --text-muted: #A8C5E0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+        background: var(--ocean-deep);
+        color: var(--text-primary);
+        font-family: 'DM Sans', sans-serif;
+        overflow-x: hidden;
+    }
+
+    nav {
+        position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 1rem 4rem;
+        background: rgba(3, 11, 26, 0.95);
+        backdrop-filter: blur(20px);
+        border-bottom: 2px solid var(--blue-dark);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-logo {
+        display: flex; align-items: center; gap: 0.8rem;
+        text-decoration: none;
+    }
+
+    .nav-logo svg { width: 40px; height: 40px; }
+
+    .nav-brand {
+        width: 75px; height: 75px;
+    }
+
+    .nav-links { display: flex; gap: 5rem; list-style: none; }
+
+    .nav-links a {
+        color: var(--text-primary); text-decoration: none;
+        font-size: 0.88rem; letter-spacing: 0.12em; text-transform: uppercase;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+    .nav-links a:hover { color: var(--yellow); text-shadow: 0 0 10px rgba(255, 195, 60, 0.4); }
+
+    .nav-cta {
+        padding: 0.6rem 1.6rem;
+        border: 1px solid var(--yellow);
+        color: var(--yellow) !important;
+        border-radius: 2px;
+        transition: background 0.3s !important;
+    }
+    .nav-cta:hover { background: var(--yellow); color: var(--ocean-deep) !important; }
+
+    /* ── HERO ── */
+    #hero {
+        min-height: 85vh;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        text-align: center;
+        position: relative;
+        padding: 8rem 2rem 4rem;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .hero-bg {
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, #0F1B2E 0%, #152340 50%, #0F1B2E 100%);
+        z-index: 0;
+    }
+
+    .hero-waves {
+        position: absolute; bottom: 0; left: 0; right: 0; height: 120px;
+        opacity: 0.15;
+    }
+
+    .bubble {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(118, 170, 255, 0.3), rgba(118, 170, 255, 0.05));
+        animation: float linear infinite;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(100vh) scale(0); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+    }
+
+    .hero-badge {
+        position: relative;
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.4rem 1.2rem;
+        border: 1px solid rgba(236, 224, 167, 0.3);
+        border-radius: 20px;
+        font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 2rem;
+        background: rgba(236, 224, 167, 0.05);
+    }
+
+    .hero-badge::before {
+        content: '';
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--yellow); animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .hero-title {
+        position: relative;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: clamp(3.8rem, 9vw, 7.5rem);
+        font-weight: 300;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        margin-bottom: 1.8rem;
+        color: #FFFFFF;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .hero-title em {
+        font-style: italic;
+        background: linear-gradient(135deg, var(--yellow), var(--blue-light));
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        text-shadow: none;
+    }
+
+    .hero-sub {
+        position: relative;
+        font-family: 'Space Mono', monospace;
+        font-size: 0.85rem; letter-spacing: 0.2em; text-transform: uppercase;
+        color: var(--text-primary);
+        margin-bottom: 3.5rem;
+        font-weight: 600;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero-stats {
+        position: relative;
+        display: flex; gap: 4rem; justify-content: center;
+        margin-bottom: 3.5rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-item { text-align: center; }
+
+    .stat-number {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 3.2rem; font-weight: 600;
+        color: var(--yellow); line-height: 1;
+        text-shadow: 0 0 30px rgba(255, 195, 60, 0.4);
+    }
+
+    .stat-label {
+        font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;
+        color: var(--text-primary); margin-top: 0.6rem;
+        font-weight: 500;
+    }
+
+    .hero-cta-group {
+        position: relative;
+        display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    }
+
+    .btn-primary {
+        padding: 1rem 2.8rem;
+        background: var(--yellow);
+        color: #000; border: none; border-radius: 6px;
+        font-size: 0.9rem; letter-spacing: 0.12em; text-transform: uppercase;
+        cursor: pointer; text-decoration: none;
+        transition: all 0.3s;
+        position: relative; overflow: hidden;
+        font-weight: 600;
+    }
+    .btn-primary::after {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+        opacity: 0; transition: opacity 0.3s;
+    }
+    .btn-primary:hover::after { opacity: 1; }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(255, 195, 60, 0.5); }
+
+    .btn-secondary {
+        padding: 1rem 2.8rem;
+        background: transparent;
+        color: var(--yellow); border: 2px solid var(--yellow);
+        border-radius: 6px;
+        font-size: 0.9rem; letter-spacing: 0.12em; text-transform: uppercase;
+        cursor: pointer; text-decoration: none;
+        transition: all 0.3s;
+        font-weight: 600;
+    }
+    .btn-secondary:hover { border-color: var(--yellow); background: rgba(255, 195, 60, 0.1); box-shadow: 0 8px 30px rgba(255, 195, 60, 0.3); }
+
+    /* ── SECTION COMMONS ── */
+    section { padding: 8rem 4rem; }
+
+    .section-label {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase;
+        color: var(--yellow);
+        display: flex; align-items: center; gap: 0.8rem;
+        margin-bottom: 1.8rem;
+        font-weight: 700;
+    }
+    .section-label::after {
+        content: ''; flex: 1; max-width: 80px;
+        height: 2px; background: var(--yellow); opacity: 0.8;
+    }
+
+    .section-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 300; line-height: 1.2;
+        margin-bottom: 1.8rem;
+        color: var(--text-primary);
+    }
+
+    .section-title strong { font-weight: 600; color: var(--yellow); text-shadow: 0 0 20px rgba(255, 195, 60, 0.3); }
+
+    .section-body {
+        font-size: 1.05rem; line-height: 1.85;
+        color: var(--text-primary); max-width: 650px;
+        font-weight: 400;
+    }
+
+    /* ── MISSION ── */
+    #mission {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 6rem;
+        align-items: center;
+        background: var(--ocean-mid);
+        border-top: 1px solid rgba(118,170,255,0.08);
+        border-bottom: 1px solid rgba(118,170,255,0.08);
+    }
+
+    .mission-visual {
+        position: relative;
+        height: 480px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .mission-visual-inner {
+        width: 100%; height: 100%;
+        background: linear-gradient(135deg, rgba(7, 20, 40, 0.8), rgba(10, 31, 64, 0.8)), url('assets/images/ecosystem.png');
+        background-size: cover;
+        background-position: center;
+        display: flex; align-items: center; justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .coral-ring {
+        position: absolute;
+        border-radius: 50%;
+        border: 1px solid rgba(118,170,255,0.15);
+        animation: spin linear infinite;
+    }
+    @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+    .robot-icon-large {
+        font-size: 6rem; z-index: 2; position: relative;
+        filter: drop-shadow(0 0 40px rgba(118,170,255,0.5));
+        animation: bob 4s ease-in-out infinite;
+        display: none;
+    }
+
+    .ecosystem-img {
+        max-width: 100%;
+        height: auto;
+        z-index: 2;
+        position: relative;
+    }
+    @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+
+    .mission-metrics {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+        background: rgba(118,170,255,0.08);
+        border: 1px solid rgba(118,170,255,0.08);
+        margin-top: 3rem;
+    }
+
+    .metric-box {
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(255,195,60,0.08), rgba(118,170,255,0.05));
+        border: 2px solid var(--blue-light);
+        border-radius: 6px;
+    }
+
+    .metric-val {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2.5rem; font-weight: 600; color: var(--yellow);
+        text-shadow: 0 0 20px rgba(255, 195, 60, 0.3);
+    }
+    .metric-desc { font-size: 0.85rem; color: var(--text-primary); margin-top: 0.4rem; line-height: 1.6; font-weight: 500; }
+
+    /* ── ROBOT ── */
+    #robot { background: var(--ocean-deep); }
+
+    .robot-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+        background: rgba(118,170,255,0.08);
+        border: 1px solid rgba(118,170,255,0.08);
+        margin-top: 4rem;
+    }
+
+    .robot-feature {
+        padding: 2.5rem;
+        background: var(--ocean-deep);
+        transition: background 0.3s;
+    }
+    .robot-feature:hover { background: var(--ocean-mid); }
+
+    .feature-icon {
+        width: 44px; height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(17,83,255,0.3), rgba(118,170,255,0.1));
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.3rem; margin-bottom: 1.2rem;
+        border: 1px solid rgba(118,170,255,0.2);
+    }
+
+    .feature-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.35rem; font-weight: 600;
+        margin-bottom: 0.8rem;
+        color: var(--yellow);
+    }
+
+    .feature-text { font-size: 0.95rem; color: var(--text-primary); line-height: 1.8; font-weight: 400; }
+
+    .vs-table {
+        width: 100%; border-collapse: collapse;
+        margin-top: 4rem;
+    }
+
+    .vs-table th {
+        padding: 1rem 1.5rem; text-align: left;
+        font-family: 'Space Mono', monospace;
+        font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+        color: var(--text-muted);
+        border-bottom: 1px solid rgba(118,170,255,0.1);
+    }
+    .vs-table td {
+        padding: 1rem 1.5rem;
+        font-size: 0.9rem;
+        border-bottom: 1px solid rgba(118,170,255,0.06);
+    }
+    .vs-table tr:hover td { background: rgba(118,170,255,0.04); }
+
+    .tag-yes { color: #4ADE80; }
+    .tag-no { color: #F87171; }
+    .tag-reefbot { color: var(--yellow); font-weight: 500; }
+
+    /* ── SERVICES / PRICING ── */
+    #services { background: var(--ocean-mid); }
+
+    .services-intro {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+        align-items: start; margin-bottom: 5rem;
+    }
+
+    .pricing-cards {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+        margin-top: 4rem;
+    }
+
+    .pricing-card {
+        border: 2px solid var(--blue-light);
+        border-radius: 8px;
+        padding: 3rem 2.5rem;
+        background: rgba(7, 20, 40, 0.8);
+        position: relative;
+        transition: all 0.3s;
+    }
+    .pricing-card:hover {
+        border-color: var(--yellow);
+        transform: translateY(-6px);
+        box-shadow: 0 25px 80px rgba(17,83,255,0.25);
+    }
+
+    .pricing-card.featured {
+        border-color: var(--yellow);
+        background: linear-gradient(135deg, rgba(255,195,60,0.12), rgba(17,83,255,0.1));
+    }
+
+    .pricing-card.featured::before {
+        content: 'RECOMMANDÉ';
+        position: absolute; top: 0; right: 1.5rem;
+        padding: 0.35rem 1rem;
+        background: var(--yellow); color: #000;
+        font-size: 0.65rem; letter-spacing: 0.2em;
+        font-family: 'Space Mono', monospace;
+        font-weight: 700;
+        border-radius: 0 0 6px 6px;
+    }
+
+    .pack-name {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+        color: var(--text-muted); margin-bottom: 0.8rem;
+    }
+
+    .pack-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.8rem; font-weight: 700;
+        margin-bottom: 1.8rem;
+        color: var(--yellow);
+    }
+
+    .pack-items { list-style: none; margin-bottom: 2rem; }
+    .pack-items li {
+        font-size: 0.9rem; color: var(--text-primary);
+        padding: 0.6rem 0;
+        display: flex; align-items: center; gap: 0.6rem;
+        border-bottom: 1px solid rgba(118,170,255,0.12);
+        font-weight: 400;
+    }
+    .pack-items li::before { content: '✓'; color: var(--yellow); font-weight: bold; }
+
+    .pack-cta {
+        display: block; width: 100%; padding: 0.8rem;
+        text-align: center;
+        border: 1px solid rgba(118,170,255,0.3);
+        color: var(--blue-light); background: transparent;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;
+        cursor: pointer; transition: all 0.3s; text-decoration: none;
+        border-radius: 2px;
+    }
+    .pack-cta:hover { background: var(--blue-dark); border-color: var(--blue-dark); color: white; }
+    .pricing-card.featured .pack-cta { background: var(--yellow); border-color: var(--yellow); color: var(--ocean-deep); }
+
+    /* Tarif grid */
+    .tarif-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px;
+        background: rgba(118,170,255,0.08);
+        border: 1px solid rgba(118,170,255,0.08);
+        margin-top: 4rem;
+    }
+
+    .tarif-item {
+        padding: 2rem 1.5rem;
+        background: var(--ocean-mid);
+        text-align: center;
+    }
+    .tarif-price {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2rem; font-weight: 600; color: var(--yellow);
+    }
+    .tarif-name {
+        font-size: 0.78rem; color: var(--text-primary);
+        margin: 0.3rem 0;
+    }
+    .tarif-note { font-size: 0.7rem; color: var(--text-muted); }
+
+    /* ── MARKETING ── */
+    #marketing { background: var(--ocean-deep); }
+
+    .marketing-grid {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+        margin-top: 4rem;
+    }
+
+    .mkt-card {
+        padding: 2.5rem;
+        border: 1px solid rgba(118,170,255,0.1);
+        border-radius: 4px;
+        position: relative; overflow: hidden;
+        transition: all 0.3s;
+    }
+    .mkt-card:hover { border-color: rgba(118,170,255,0.3); background: rgba(118,170,255,0.03); }
+
+    .mkt-card::before {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, var(--blue-dark), var(--blue-light));
+    }
+
+    .mkt-number {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 4rem; font-weight: 300;
+        color: rgba(118,170,255,0.15);
+        line-height: 1;
+        position: absolute; top: 1rem; right: 1.5rem;
+    }
+
+    .mkt-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.3rem; font-weight: 600;
+        margin-bottom: 1rem; color: var(--gold);
+    }
+
+    .mkt-items { list-style: none; }
+    .mkt-items li {
+        font-size: 0.83rem; color: var(--text-muted);
+        padding: 0.35rem 0;
+        border-bottom: 1px solid rgba(118,170,255,0.05);
+        display: flex; gap: 0.5rem;
+    }
+    .mkt-items li span { color: var(--blue-light); flex-shrink: 0; }
+
+    /* Events */
+    .events-row {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+        margin-top: 3rem;
+    }
+
+    .event-card {
+        display: flex; gap: 1.5rem; align-items: flex-start;
+        padding: 1.8rem;
+        border: 1px solid rgba(236,224,167,0.15);
+        border-radius: 4px;
+        background: rgba(236,224,167,0.03);
+        transition: all 0.3s;
+    }
+    .event-card:hover { border-color: rgba(236,224,167,0.4); }
+
+    .event-date {
+        text-align: center; flex-shrink: 0;
+        padding: 0.8rem 1.2rem;
+        background: var(--yellow); color: var(--ocean-deep);
+        border-radius: 2px;
+    }
+    .event-day { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; line-height: 1; }
+    .event-month { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; }
+
+    .event-info h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .event-info p { font-size: 0.8rem; color: var(--text-muted); }
+    .event-loc { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.5rem; font-size: 0.75rem; color: var(--blue-light); }
+
+    /* ── FLOORPLAN ── */
+    #floorplan { background: var(--ocean-mid); }
+
+    .floorplan-tabs {
+        display: flex; gap: 0; margin: 3rem 0 0;
+        border-bottom: 1px solid rgba(118,170,255,0.1);
+    }
+
+    .tab-btn {
+        padding: 0.8rem 2rem;
+        background: transparent;
+        border: none; border-bottom: 2px solid transparent;
+        color: var(--text-muted);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase;
+        cursor: pointer; transition: all 0.3s;
+    }
+    .tab-btn.active { color: var(--yellow); border-bottom-color: var(--yellow); }
+    .tab-btn:hover { color: var(--text-primary); }
+
+    .tab-content { display: none; padding-top: 3rem; }
+    .tab-content.active { display: block; }
+
+    .floorplan-layout {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start;
+    }
+
+    .fp-map {
+        display: grid;
+        gap: 2px;
+        background: rgba(118,170,255,0.08);
+        padding: 2px;
+        border-radius: 4px;
+    }
+
+    .fp-row { display: grid; gap: 2px; }
+
+    .fp-zone {
+        padding: 1.2rem; border-radius: 2px;
+        position: relative;
+        min-height: 80px; display: flex; flex-direction: column; justify-content: flex-end;
+    }
+
+    .fp-zone-label {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase;
+        font-weight: 700;
+    }
+    .fp-zone-pct { font-size: 0.7rem; opacity: 0.7; }
+
+    .zone-rd { background: rgba(118,170,255,0.12); color: var(--blue-light); }
+    .zone-proto { background: rgba(17,83,255,0.15); color: #93C5FD; }
+    .zone-meet { background: rgba(236,224,167,0.08); color: var(--gold); }
+    .zone-lounge { background: rgba(255,195,60,0.08); color: var(--yellow); }
+    .zone-storage { background: rgba(118,170,255,0.06); color: var(--text-muted); }
+    .zone-wc { background: rgba(118,170,255,0.04); color: var(--text-muted); }
+    .zone-prod { background: rgba(17,83,255,0.2); color: var(--blue-light); }
+    .zone-test { background: rgba(74,222,128,0.08); color: #4ADE80; }
+    .zone-corp { background: rgba(236,224,167,0.1); color: var(--gold); }
+    .zone-dock { background: rgba(118,170,255,0.08); color: var(--text-muted); }
+
+    .fp-legend { margin-top: 2rem; }
+    .fp-legend h4 {
+        font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; margin-bottom: 1rem;
+    }
+    .legend-items { display: flex; flex-direction: column; gap: 0.6rem; }
+    .legend-item { display: flex; align-items: center; gap: 0.8rem; font-size: 0.82rem; color: var(--text-muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+    .fp-info h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 400; margin-bottom: 1.5rem; }
+    .fp-details { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; }
+    .fp-details li {
+        display: flex; justify-content: space-between;
+        padding: 0.8rem 0; border-bottom: 1px solid rgba(118,170,255,0.08);
+        font-size: 0.88rem;
+    }
+    .fp-details li span:first-child { color: var(--text-muted); }
+    .fp-details li span:last-child { color: var(--text-primary); font-weight: 500; }
+
+    /* ── TEAM ── */
+    #team { background: var(--ocean-deep); }
+
+    .team-grid {
+        display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem;
+        margin-top: 4rem;
+    }
+
+    .team-card {
+        padding: 2.5rem 2rem;
+        border: 2px solid var(--blue-light);
+        border-radius: 8px;
+        text-align: center;
+        transition: all 0.3s;
+        background: linear-gradient(135deg, rgba(17,83,255,0.05), rgba(7,20,40,0.5));
+    }
+    .team-card:hover { border-color: var(--yellow); transform: translateY(-6px); box-shadow: 0 20px 60px rgba(255,195,60,0.2); }
+
+    .avatar {
+        width: 64px; height: 64px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--blue-dark), var(--blue-light));
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; margin: 0 auto 1rem;
+        border: 2px solid rgba(118,170,255,0.2);
+    }
+
+    .team-name {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.25rem; font-weight: 700; margin-bottom: 0.4rem;
+        color: var(--yellow);
+    }
+    .team-role {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+        color: var(--blue-light);
+        font-weight: 600;
+    }
+
+    /* ── CLIENTS ── */
+    #clients {
+        background: var(--ocean-mid);
+        text-align: center;
+    }
+
+    .client-types {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+        margin-top: 4rem;
+    }
+
+    .client-card {
+        padding: 3rem 2rem;
+        border: 1px solid rgba(118,170,255,0.1);
+        border-radius: 4px;
+        transition: all 0.3s;
+    }
+    .client-card:hover { border-color: rgba(118,170,255,0.3); background: rgba(118,170,255,0.03); }
+
+    .client-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+    .client-type {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.3rem; font-weight: 600; margin-bottom: 0.8rem;
+    }
+    .client-desc { font-size: 0.83rem; color: var(--text-muted); line-height: 1.7; }
+
+    /* ── CONTACT ── */
+    #contact {
+        background: var(--ocean-deep);
+        padding: 7rem 4rem;
+    }
+
+    .contact-inner {
+        max-width: 800px; margin: 0 auto; text-align: center;
+    }
+
+    .contact-info {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+        background: rgba(118,170,255,0.08);
+        margin-top: 3rem; margin-bottom: 2rem;
+    }
+
+    .contact-item {
+        padding: 2.5rem; background: linear-gradient(135deg, rgba(17,83,255,0.08), rgba(7,20,40,0.8));
+        display: flex; flex-direction: column; gap: 0.6rem;
+        border: 2px solid var(--blue-light);
+        border-radius: 8px;
+    }
+    .contact-item-label {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+        color: var(--blue-light);
+        font-weight: 700;
+    }
+    .contact-item-val {
+        font-size: 1rem; color: var(--yellow);
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .contact-item-val:hover { color: var(--blue-light); text-decoration: underline; }
+
+    /* ── FOOTER ── */
+    footer {
+        background: #000000;
+        border-top: 2px solid var(--blue-dark);
+        padding: 4rem;
+        display: flex; justify-content: space-between; align-items: center;
+        flex-wrap: wrap; gap: 2rem;
+        box-shadow: 0 -4px 20px rgba(17, 83, 255, 0.15);
+    }
+
+    .footer-brand {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.4rem; font-weight: 700; color: var(--yellow);
+    }
+    .footer-tagline { font-size: 0.8rem; color: var(--text-primary); margin-top: 0.3rem; font-style: italic; }
+
+    .footer-sdgs { display: flex; gap: 0.5rem; align-items: center; }
+    .sdg-badge {
+        width: 36px; height: 36px; border-radius: 3px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.6rem; font-weight: 700; color: white; text-align: center; line-height: 1.2;
+    }
+
+    .footer-copy { font-size: 0.72rem; color: var(--text-muted); text-align: right; }
+
+    /* ── HERO IMAGE SECTION ── */
+    #hero-image {
+        width: 100%;
+        background: linear-gradient(135deg, #152340, #0F1B2E);
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+
+    #hero-image img {
+        max-width: 100%;
+        height: auto;
+        max-height: 500px;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(255, 195, 60, 0.15);
+    }
+    .reveal {
+        opacity: 0; transform: translateY(30px);
+        transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* Images */
+    img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+
+    .facility-img, .warehouse-img, .floorplan-img, .client-logo {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        nav { padding: 1rem 1.5rem; }
+        .nav-links { display: none; }
+        section { padding: 5rem 1.5rem; }
+        #mission, .services-intro, .floorplan-layout { grid-template-columns: 1fr; }
+        .robot-grid, .marketing-grid, .pricing-cards, .team-grid, .client-types { grid-template-columns: 1fr; }
+        .events-row, .contact-info { grid-template-columns: 1fr; }
+        footer { flex-direction: column; align-items: flex-start; }
+        .footer-copy { text-align: left; }
+        .hero-stats { gap: 2rem; }
+    }
+
+    /* Divider */
+    .wave-divider { height: 2px; background: linear-gradient(90deg, transparent, var(--blue-dark), var(--blue-light), var(--blue-dark), transparent); opacity: 0.3; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+    <a href="#" class="nav-logo">
+        <img
+        class="nav-brand"
+        src="/assets/logos/logo.png"
+        alt="Logo" />
+
+    </a>
+    <ul class="nav-links">
+        <li><a href="#mission">Mission</a></li>
+        <li><a href="#robot">Technologie</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#marketing">Stratégie</a></li>
+        <li><a href="#floorplan">Infrastructures</a></li>
+        <li><a href="#team">Équipe</a></li>
+        <li><a href="#contact" class="nav-cta">Contact</a></li>
+    </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+    <div class="hero-bg"></div>
+
+    <!-- Bubbles -->
+    <div class="bubble" style="width:8px;height:8px;left:15%;animation-duration:12s;animation-delay:0s"></div>
+    <div class="bubble" style="width:5px;height:5px;left:30%;animation-duration:9s;animation-delay:3s"></div>
+    <div class="bubble" style="width:10px;height:10px;left:55%;animation-duration:14s;animation-delay:1s"></div>
+    <div class="bubble" style="width:6px;height:6px;left:70%;animation-duration:11s;animation-delay:5s"></div>
+    <div class="bubble" style="width:4px;height:4px;left:85%;animation-duration:8s;animation-delay:2s"></div>
+    <div class="bubble" style="width:7px;height:7px;left:42%;animation-duration:13s;animation-delay:7s"></div>
+
+    <div class="hero-badge">🌊 Deep Tech Environnemental — Phase Pré-lancement</div>
+
+    <h1 class="hero-title">
+        Restaurer l'océan,<br>
+        <em>récif par récif.</em>
+    </h1>
+
+    <p class="hero-sub">Robot Autonome IA · Récifs Coralliens · 24h/24 Sans Intervention Humaine</p>
+
+    <div class="hero-stats">
+        <div class="stat-item">
+            <div class="stat-number">&lt;0,1%</div>
+            <div class="stat-label">des océans couverts<br>par les récifs</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">25%</div>
+            <div class="stat-label">de la biodiversité<br>marine abritée</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">88 Mt</div>
+            <div class="stat-label">de CO₂ stockées<br>par an</div>
+        </div>
+    </div>
+
+    <div class="hero-cta-group">
+        <a href="#services" class="btn-primary">Découvrir nos solutions</a>
+        <a href="#robot" class="btn-secondary">Notre technologie →</a>
+    </div>
+
+    <svg class="hero-waves" viewBox="0 0 1440 80" preserveAspectRatio="none">
+        <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,30 1440,40 L1440,80 L0,80 Z" fill="#1153FF" opacity="0.3"/>
+        <path d="M0,55 C240,20 480,70 720,45 C960,20 1200,65 1440,55 L1440,80 L0,80 Z" fill="#76AAFF" opacity="0.15"/>
+    </svg>
+</section>
+
+<div class="wave-divider"></div>
+
+<!-- MISSION -->
+<section id="mission">
+    <div class="mission-visual reveal">
+             <img src="assets/images/ecosystem.png" alt="Écosystème avec robots et récifs" class="ecosystem-img" style="max-width:800px;">
+            <!-- Animated dots -->
+            <div style="position:absolute;top:20%;left:25%;width:6px;height:6px;border-radius:50%;background:var(--blue-light);opacity:0.8;animation:pulse 2.5s infinite 0.5s"></div>
+            <div style="position:absolute;bottom:30%;right:22%;width:4px;height:4px;border-radius:50%;background:var(--yellow);opacity:0.8;animation:pulse 2s infinite 1s"></div>
+            <div style="position:absolute;top:60%;left:15%;width:5px;height:5px;border-radius:50%;background:var(--blue-light);opacity:0.6;animation:pulse 3s infinite"></div>
+    </div>
+
+    <div class="reveal" style="animation-delay:0.2s">
+        <div class="section-label">Notre Mission</div>
+        <h2 class="section-title">
+            Automatiser la <strong>restauration<br>des écosystèmes marins</strong>
+        </h2>
+        <p class="section-body">
+            Nous concevons des solutions robotiques 100% autonomes capables de scanner, protéger et restaurer les fonds marins 24h/24 sans intervention humaine. Notre objectif est de transformer une intervention humaine traditionnellement lente et risquée en un processus industriel rapide, durable et de haute précision.
+        </p>
+        <p class="section-body" style="margin-top:1rem">
+            <em style="color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:1.1rem">Notre vision :</em> Devenir le standard mondial de la régénération océanique assistée par l'IA.
+        </p>
+
+        <div class="mission-metrics">
+            <div class="metric-box">
+                <div class="metric-val">24h/24</div>
+                <div class="metric-desc">Opération continue sans intervention humaine</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-val">100%</div>
+                <div class="metric-desc">Autonomie — scan, protection et restauration</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-val">3-en-1</div>
+                <div class="metric-desc">Seule solution combinant observation, protection et plantation</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-val">ODD 13·14·15</div>
+                <div class="metric-desc">Aligné sur les Objectifs de Développement Durable</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="wave-divider"></div>
+
+<!-- ROBOT / TECHNOLOGIE -->
+<section id="robot">
+    <div class="section-label reveal">Technologie</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:end" class="reveal">
+        <h2 class="section-title">
+            Le premier robot qui fait <strong>les trois</strong>
+        </h2>
+        <p class="section-body">
+            Là où les concurrents font soit de l'observation, soit de la protection, soit de la plantation, ReefBot est la première solution à intégrer les trois fonctions dans un robot entièrement autonome, opérationnel 24h/24.
+        </p>
+    </div>
+
+    <div class="robot-grid reveal" style="animation-delay:0.2s">
+        <div class="robot-feature">
+            <div class="feature-icon">🔍</div>
+            <div class="feature-title">Scanner en continu</div>
+            <div class="feature-text">Exploration permanente des fonds marins grâce à des capteurs LIDAR sous-marins. Cartographie en temps réel des zones à surveiller et des substrats favorables.</div>
+        </div>
+        <div class="robot-feature">
+            <div class="feature-icon">🧠</div>
+            <div class="feature-title">Détection IA autonome</div>
+            <div class="feature-text">Identification automatique des coraux dégradés ou fatigués. L'IA embarquée réduit fortement les erreurs de surveillance et permet une réaction immédiate.</div>
+        </div>
+        <div class="robot-feature">
+            <div class="feature-icon">🪸</div>
+            <div class="feature-title">Installer des structures</div>
+            <div class="feature-text">Pose de structures de corail artificiel renforcées, plus résistantes au blanchissement et aux chocs thermiques. Aucun autre robot ne remplace les structures fragiles.</div>
+        </div>
+        <div class="robot-feature">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-title">Retour automatique</div>
+            <div class="feature-text">Retour autonome à la base pour recharge et maintenance. Zéro temps d'arrêt forcé, zéro intervention humaine dans le cycle opérationnel.</div>
+        </div>
+        <div class="robot-feature">
+            <div class="feature-icon">📡</div>
+            <div class="feature-title">Data en temps réel</div>
+            <div class="feature-text">Transmission continue des données environnementales : qualité de l'eau, état des récifs, CO₂ stocké, biodiversité. Accessible via dashboard et application mobile.</div>
+        </div>
+        <div class="robot-feature">
+            <div class="feature-icon">🚨</div>
+            <div class="feature-title">Alertes blanchissement</div>
+            <div class="feature-text">Détection précoce des épisodes de blanchissement thermique. Alertes automatiques et intervention rapide avant dégradation irréversible.</div>
+        </div>
+    </div>
+
+    <!-- Competitive comparison -->
+    <div class="reveal" style="margin-top:5rem;animation-delay:0.3s">
+        <div class="section-label">Avantage concurrentiel</div>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;margin-bottom:0.5rem">ReefBot vs. le marché existant</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0">LarvalBot, RangerBot, SoFi (MIT) — ce qui existe, et ce qui manque.</p>
+        <table class="vs-table" style="margin-top:2rem">
+            <thead>
+                <tr>
+                    <th>Fonctionnalité</th>
+                    <th>Concurrents</th>
+                    <th class="tag-reefbot">ReefBot</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Observation des fonds</td>
+                    <td class="tag-yes">✓ Partiel</td>
+                    <td class="tag-reefbot">✓ Complet</td>
+                </tr>
+                <tr>
+                    <td>Protection active</td>
+                    <td class="tag-yes">✓ RangerBot uniquement</td>
+                    <td class="tag-reefbot">✓ Intégré</td>
+                </tr>
+                <tr>
+                    <td>Plantation / restauration</td>
+                    <td class="tag-yes">✓ LarvalBot uniquement</td>
+                    <td class="tag-reefbot">✓ Intégré</td>
+                </tr>
+                <tr>
+                    <td>Autonomie 24h/24</td>
+                    <td class="tag-no">✗ Intervention requise</td>
+                    <td class="tag-reefbot">✓ Total</td>
+                </tr>
+                <tr>
+                    <td>Remplacement structures corail</td>
+                    <td class="tag-no">✗ Non</td>
+                    <td class="tag-reefbot">✓ Structures renforcées</td>
+                </tr>
+                <tr>
+                    <td>Déploiement à grande échelle</td>
+                    <td class="tag-no">✗ Projets pilotes limités</td>
+                    <td class="tag-reefbot">✓ Scalable</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<div class="wave-divider"></div>
+
+<!-- SERVICES & PRICING -->
+<section id="services">
+    <div class="services-intro">
+        <div class="reveal">
+            <div class="section-label">Offres & Tarifs</div>
+            <h2 class="section-title">Des solutions adaptées à <strong>chaque mission</strong></h2>
+        </div>
+        <div class="reveal" style="animation-delay:0.2s">
+            <p class="section-body" style="padding-top:2rem">
+                Restauration autonome h24, surveillance continue, rapports d'impact environnemental, interventions post-blanchissement, installation de structures coralliennes renforcées et formation des équipes locales.
+            </p>
+        </div>
+    </div>
+
+    <div class="pricing-cards reveal">
+        <div class="pricing-card">
+            <div class="pack-name">Pack 01</div>
+            <div class="pack-title">Surveillance<br>Continue</div>
+            <ul class="pack-items">
+                <li>Monitoring 24h/24 des récifs</li>
+                <li>Alertes blanchissement en temps réel</li>
+                <li>Dashboard de données environnementales</li>
+                <li>Rapport d'impact mensuel</li>
+                <li>Application mobile incluse</li>
+            </ul>
+            <a href="#contact" class="pack-cta">Demander un devis</a>
+        </div>
+        <div class="pricing-card featured">
+            <div class="pack-name">Pack 02</div>
+            <div class="pack-title">Restauration<br>Complète</div>
+            <ul class="pack-items">
+                <li>Tout du pack Surveillance</li>
+                <li>Plantation de coraux artificiels renforcés</li>
+                <li>Installation de structures coralliennes</li>
+                <li>Rapports scientifiques co-signés</li>
+                <li>Suivi d'impact sur 12 mois</li>
+            </ul>
+            <a href="#contact" class="pack-cta">Demander un devis</a>
+        </div>
+        <div class="pricing-card">
+            <div class="pack-name">Pack 03</div>
+            <div class="pack-title">Urgence<br>Blanchiment</div>
+            <ul class="pack-items">
+                <li>Déploiement prioritaire 72h</li>
+                <li>Intervention post-blanchissement ciblée</li>
+                <li>Stabilisation rapide des zones critiques</li>
+                <li>Rapport d'intervention certifié</li>
+                <li>Suivi post-intervention 6 mois</li>
+            </ul>
+            <a href="#contact" class="pack-cta">Demander un devis</a>
+        </div>
+    </div>
+
+    <!-- Tarif grid -->
+    <div class="tarif-grid reveal" style="animation-delay:0.3s">
+        <div class="tarif-item">
+            <div class="tarif-price">150 000€</div>
+            <div class="tarif-name">Vente d'un robot</div>
+            <div class="tarif-note">Achat direct</div>
+        </div>
+        <div class="tarif-item">
+            <div class="tarif-price">10 000€</div>
+            <div class="tarif-name">Location / Leasing</div>
+            <div class="tarif-note">par mois</div>
+        </div>
+        <div class="tarif-item">
+            <div class="tarif-price">10 000€</div>
+            <div class="tarif-name">Maintenance annuelle</div>
+            <div class="tarif-note">par robot / an</div>
+        </div>
+        <div class="tarif-item">
+            <div class="tarif-price">25 000€</div>
+            <div class="tarif-name">Intervention urgence</div>
+            <div class="tarif-note">déploiement prioritaire</div>
+        </div>
+        <div class="tarif-item">
+            <div class="tarif-price">50 000€</div>
+            <div class="tarif-name">Vente de données</div>
+            <div class="tarif-note">données env. / an</div>
+        </div>
+    </div>
+</section>
+
+<div class="wave-divider"></div>
+
+<!-- MARKETING -->
+<section id="marketing">
+    <div class="reveal">
+        <div class="section-label">Stratégie Marketing</div>
+        <h2 class="section-title">
+            Crédibilité, Influence<br>& <strong>Démocratisation</strong>
+        </h2>
+    </div>
+
+    <div class="marketing-grid reveal" style="animation-delay:0.15s">
+        <div class="mkt-card">
+            <div class="mkt-number">01</div>
+            <div class="mkt-title">Crédibilité scientifique</div>
+            <ul class="mkt-items">
+                <li><span>→</span> Tests en conditions réelles avec experts aquariophilie</li>
+                <li><span>→</span> Collaboration avec labos de biologie marine</li>
+                <li><span>→</span> Publications scientifiques co-signées</li>
+                <li><span>→</span> Partenariats aquariums publics & centres de recherche</li>
+            </ul>
+        </div>
+        <div class="mkt-card">
+            <div class="mkt-number">02</div>
+            <div class="mkt-title">Canaux d'acquisition</div>
+            <ul class="mkt-items">
+                <li><span>→</span> Site web avec live data : carte mondiale des récifs restaurés</li>
+                <li><span>→</span> LinkedIn : thought leadership CEO/CTO</li>
+                <li><span>→</span> YouTube : vidéos sous-marines du robot en action</li>
+                <li><span>→</span> Relations presse : médias environnement + tech</li>
+                <li><span>→</span> Démarche directe ambassades & ministères</li>
+            </ul>
+        </div>
+        <div class="mkt-card">
+            <div class="mkt-number">03</div>
+            <div class="mkt-title">Simplification & Accessibilité</div>
+            <ul class="mkt-items">
+                <li><span>→</span> Communication sur les bénéfices, pas la technologie</li>
+                <li><span>→</span> App mobile intuitive avec parcours utilisateur simplifié</li>
+                <li><span>→</span> Tutoriels, guides et vidéos explicatives</li>
+                <li><span>→</span> Options de paiement en plusieurs fois</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Roadmap -->
+    <div class="reveal" style="margin-top:4rem;animation-delay:0.2s">
+        <div class="section-label">Roadmap Marketing — 18 mois</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(118,170,255,0.08);border:1px solid rgba(118,170,255,0.08);margin-top:2rem">
+            <div style="padding:2rem;background:var(--ocean-deep)">
+                <div style="font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;color:var(--yellow);margin-bottom:0.8rem">M1–M4 · FONDATIONS</div>
+                <p style="font-size:0.83rem;color:var(--text-muted);line-height:1.7">Construire la marque : site, identité visuelle, vidéo hero du robot. Lancer LinkedIn + newsletter. Identifier 3 partenaires scientifiques. Cartographier 30 prospects B2G prioritaires.</p>
+            </div>
+            <div style="padding:2rem;background:var(--ocean-deep)">
+                <div style="font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;color:var(--blue-light);margin-bottom:0.8rem">M5–M10 · PREUVE</div>
+                <p style="font-size:0.83rem;color:var(--text-muted);line-height:1.7">Lancer le pilote avec 1–2 partenaires. Documenter et publier les résultats. Présenter à Our Ocean + 1 conf scientifique. Activer outreach direct sur 10 comptes ESG.</p>
+            </div>
+            <div style="padding:2rem;background:var(--ocean-deep)">
+                <div style="font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;color:#4ADE80;margin-bottom:0.8rem">M11–M18 · TRACTION</div>
+                <p style="font-size:0.83rem;color:var(--text-muted);line-height:1.7">Convertir les pilotes en contrats. Lancer campagne ABM vers 20 comptes B2B. Candidater aux appels à projets Horizon Europe & Banque Mondiale. Viser 3–5 clients payants.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Events -->
+    <div class="reveal" style="margin-top:4rem;animation-delay:0.25s">
+        <div class="section-label">Présence événementielle 2026</div>
+        <div class="events-row" style="margin-top:2rem">
+            <div class="event-card">
+                <div class="event-date">
+                    <div class="event-day">28</div>
+                    <div class="event-month">Juin 2026</div>
+                </div>
+                <div class="event-info">
+                    <h4>Salon des Maires & Collectivités</h4>
+                    <p>Solutions IA autonomes pour la restauration des récifs coralliens</p>
+                    <div class="event-loc">📍 Corum, Montpellier</div>
+                </div>
+            </div>
+            <div class="event-card">
+                <div class="event-date">
+                    <div class="event-day">30</div>
+                    <div class="event-month">Juin 2026</div>
+                </div>
+                <div class="event-info">
+                    <h4>ChangeNOW — Solutions pour la Planète</h4>
+                    <p>Le sommet mondial des solutions pour la planète</p>
+                    <div class="event-loc">📍 Paris Expo Porte de Versailles</div>
+                </div>
+            </div>
+            <div class="event-card">
+                <div class="event-date">
+                    <div class="event-day">16</div>
+                    <div class="event-month">Juin 2026</div>
+                </div>
+                <div class="event-info">
+                    <h4>Our Ocean Conference 2026</h4>
+                    <p>11e édition — Économie bleue durable. Rencontre B2G privilégiée.</p>
+                    <div class="event-loc">📍 Mombasa, Kenya</div>
+                </div>
+            </div>
+            <div class="event-card">
+                <div class="event-date">
+                    <div class="event-day">4–7</div>
+                    <div class="event-month">Fév 2026</div>
+                </div>
+                <div class="event-info">
+                    <h4>AdNatura 2026</h4>
+                    <p>Salon National des Professionnels de l'Écologie et de la Biodiversité</p>
+                    <div class="event-loc">📍 Montpellier</div>
+                </div>
+            </div>
+             <div class="event-card">
+                <div class="event-info">
+                    <img src="assets/images/flyer1.png" style="width: 400px; height: 550px;">
+                </div>
+            </div>
+             <div class="event-card">
+                <div class="event-info">
+                    <img src="assets/images/flyer2.png" style="width: 400px; height: 550px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="wave-divider"></div>
+
+<!-- FLOORPLAN -->
+<section id="floorplan">
+    <div class="reveal">
+        <div class="section-label">Infrastructures</div>
+        <h2 class="section-title">Nos <strong>espaces de travail</strong></h2>
+        <p class="section-body">Implantés à Toulon, au cœur du bassin méditerranéen, avec accès direct à la mer et proximité des universités maritimes.</p>
+    </div>
+
+    <div class="floorplan-tabs reveal" style="animation-delay:0.2s">
+        <button class="tab-btn active" onclick="showTab('hq', event)">HQ — Quartier Montéty (200 m²)</button>
+        <button class="tab-btn" onclick="showTab('prod', event)">Production — La Garde (3 000 m²)</button>
+    </div>
+
+    <!-- HQ Tab -->
+    <div id="tab-hq" class="tab-content active">
+        <img src="assets/images/floorplan-hq.png" alt="Plan d'étage HQ Montéty" class="floorplan-img reveal" style="max-width:100%;margin-bottom:2rem;display:block;">
+        <div class="floorplan-layout">
+            <div>
+                <div class="fp-map">
+                    <div class="fp-row" style="grid-template-columns:3fr 1fr">
+                        <div class="fp-zone zone-rd" style="min-height:160px">
+                            <div class="fp-zone-label">Work & R&D Open Space</div>
+                            <div class="fp-zone-pct">45% — ~90 m²</div>
+                        </div>
+                        <div style="display:grid;gap:2px">
+                            <div class="fp-zone zone-meet">
+                                <div class="fp-zone-label">Meeting & Demo</div>
+                                <div class="fp-zone-pct">25%</div>
+                            </div>
+                            <div class="fp-zone zone-proto">
+                                <div class="fp-zone-label">Lab & Proto</div>
+                                <div class="fp-zone-pct">15%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fp-row" style="grid-template-columns:2fr 1fr 1fr">
+                        <div class="fp-zone zone-lounge">
+                            <div class="fp-zone-label">Kitchenette & Lounge</div>
+                            <div class="fp-zone-pct">10%</div>
+                        </div>
+                        <div class="fp-zone zone-wc">
+                            <div class="fp-zone-label">Restrooms</div>
+                        </div>
+                        <div class="fp-zone zone-storage">
+                            <div class="fp-zone-label">Storage / Servers</div>
+                            <div class="fp-zone-pct">10%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fp-legend" style="margin-top:1.5rem">
+                    <div class="legend-items">
+                        <div class="legend-item"><div class="legend-dot" style="background:rgba(118,170,255,0.4)"></div> Work & R&D Open Space — développement logiciel et électronique collaboratif</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:rgba(236,224,167,0.3)"></div> Meeting Room & Demo Area — écran large, prototype ReefBot miniature</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:rgba(17,83,255,0.4)"></div> Lab & Prototyping Room — soudure, assemblage, tests IA</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:rgba(255,195,60,0.25)"></div> Kitchenette & Lounge</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fp-info">
+                <h3>Quartier Montéty,<br>Toulon — Les Lices</h3>
+                <ul class="fp-details">
+                    <li><span>Surface totale</span><span>~200 m²</span></li>
+                    <li><span>Loyer</span><span>4 510 € / mois (CC)</span></li>
+                    <li><span>Usage</span><span>Bureau R&D + Showroom tech</span></li>
+                    <li><span>Localisation</span><span>Quartier Montéty, Toulon 83000</span></li>
+                    <li><span>Atout principal</span><span>Proximité port de Toulon</span></li>
+                    <li><span>Showroom</span><span>Aquarium de démonstration</span></li>
+                </ul>
+                <p style="margin-top:2rem;font-size:0.85rem;color:var(--text-muted);line-height:1.7">
+                    Ce local est le visage commercial de ReefBot — espace d'accueil des partenaires, démos techniques, et développement des premières versions du robot dans un atelier dédié.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Production Tab -->
+    <div id="tab-prod" class="tab-content">
+        <img src="assets/images/floorplan-prod.png" alt="Plan d'étage Production La Garde" class="floorplan-img reveal" style="max-width:100%;margin-bottom:2rem;display:block;">
+        <div class="floorplan-layout">
+            <div>
+                <div class="fp-map">
+                    <div class="fp-row" style="grid-template-columns:2fr 1fr">
+                        <div class="fp-zone zone-prod" style="min-height:120px">
+                            <div class="fp-zone-label">Production Floor</div>
+                            <div class="fp-zone-pct">~1 800 m² — Assemblage, IA, QC</div>
+                        </div>
+                        <div class="fp-zone zone-test" style="min-height:120px">
+                            <div class="fp-zone-label">Testing & R&D Complex</div>
+                            <div class="fp-zone-pct">Marine tank, AI labs, Battery tests</div>
+                        </div>
+                    </div>
+                    <div class="fp-row" style="grid-template-columns:1fr 1fr 1fr">
+                        <div class="fp-zone zone-dock">
+                            <div class="fp-zone-label">Receiving & Shipping Docks</div>
+                        </div>
+                        <div class="fp-zone zone-storage">
+                            <div class="fp-zone-label">Components Warehouse</div>
+                        </div>
+                        <div class="fp-zone zone-corp" style="min-height:90px">
+                            <div class="fp-zone-label">Corporate & Visitor Center</div>
+                            <div class="fp-zone-pct">~600 m²</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fp-legend" style="margin-top:1.5rem">
+                    <div class="legend-items">
+                        <div class="legend-item"><div class="legend-dot" style="background:rgba(17,83,255,0.5)"></div> Production Floor — Electronics & AI, Final Assembly, Coral Structure Fabrication</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:rgba(74,222,128,0.3)"></div> Testing & R&D — Marine Test Tank (deep & shallow), AI & Robotics Labs</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:rgba(236,224,167,0.3)"></div> Corporate & Visitor Center — Showroom, Admin, Meeting rooms</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fp-info">
+                <h3>Pôle d'Activité Toulon Est,<br>La Garde — 83130</h3>
+                <ul class="fp-details">
+                    <li><span>Surface totale</span><span>3 000 m²+</span></li>
+                    <li><span>Type</span><span>Zone industrielle (entrepôts + ateliers)</span></li>
+                    <li><span>Accès</span><span>Autoroute + Port de Toulon</span></li>
+                    <li><span>Production floor</span><span>~1 800 m²</span></li>
+                    <li><span>Visitor center</span><span>~600 m²</span></li>
+                    <li><span>R&D complex</span><span>Marine test tank inclus</span></li>
+                </ul>
+                <p style="margin-top:2rem;font-size:0.85rem;color:var(--text-muted);line-height:1.7">
+                    La facilité de production intègre l'assemblage complet des robots, les tests en conditions marines réelles et un espace visiteurs avec showroom. Accès direct au port de Toulon pour les déploiements maritimes.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="wave-divider"></div>
+
+<!-- TEAM -->
+<section id="team">
+    <div class="reveal">
+        <div class="section-label">L'Équipe</div>
+        <h2 class="section-title">Des profils <strong>complémentaires</strong><br>pour une mission ambitieuse</h2>
+    </div>
+
+    <div class="team-grid reveal" style="animation-delay:0.15s">
+        <div class="team-card">
+            <div class="avatar">🌊</div>
+            <div class="team-name">Maé Jourdan-Combes</div>
+            <div class="team-role">CEO · Fondatrice</div>
+        </div>
+        <div class="team-card">
+            <div class="avatar">🤖</div>
+            <div class="team-name">Marco Pinheiro</div>
+            <div class="team-role">CTO · Robot & IA</div>
+        </div>
+        <div class="team-card">
+            <div class="avatar">⚓</div>
+            <div class="team-name">Yohan Bramond</div>
+            <div class="team-role">COO · Opérations Maritimes</div>
+        </div>
+        <div class="team-card">
+            <div class="avatar">📊</div>
+            <div class="team-name">Clément Bancarel</div>
+            <div class="team-role">CFO · Finance & Subventions</div>
+        </div>
+        <div class="team-card">
+            <div class="avatar">🤝</div>
+            <div class="team-name">Aya Harnafi</div>
+            <div class="team-role">CCO · Commercial</div>
+        </div>
+    </div>
+
+    <!-- Departments -->
+    <div style="margin-top:4rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:rgba(118,170,255,0.08);border:1px solid rgba(118,170,255,0.08)" class="reveal" style="animation-delay:0.3s">
+        <div style="padding:1.5rem;background:var(--ocean-deep)">
+            <div style="font-size:1.3rem;margin-bottom:0.5rem">🔧</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">Ingénierie Robotique</div>
+        </div>
+        <div style="padding:1.5rem;background:var(--ocean-deep)">
+            <div style="font-size:1.3rem;margin-bottom:0.5rem">🧬</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">Développement IA</div>
+        </div>
+        <div style="padding:1.5rem;background:var(--ocean-deep)">
+            <div style="font-size:1.3rem;margin-bottom:0.5rem">🐠</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">Biologistes Marins</div>
+        </div>
+        <div style="padding:1.5rem;background:var(--ocean-deep)">
+            <div style="font-size:1.3rem;margin-bottom:0.5rem">⛵</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">Opérations Maritimes</div>
+        </div>
+        <div style="padding:1.5rem;background:var(--ocean-deep)">
+            <div style="font-size:1.3rem;margin-bottom:0.5rem">🌱</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">RSE & Partenariats</div>
+        </div>
+        <div style="padding:1.5rem;background:var(--ocean-deep)">
+            <div style="font-size:1.3rem;margin-bottom:0.5rem">📣</div>
+            <div style="font-size:0.75rem;color:var(--text-muted)">Marketing & CRM</div>
+        </div>
+    </div>
+</section>
+
+<div class="wave-divider"></div>
+
+<!-- CLIENTS -->
+<section id="clients">
+    <div class="reveal">
+        <div class="section-label">Nos Clients</div>
+        <h2 class="section-title">Qui fait <strong>confiance</strong><br>à ReefBot ?</h2>
+    </div>
+
+    <div class="client-types reveal" style="animation-delay:0.15s">
+        <div class="client-card">
+            <span class="client-icon">🏛️</span>
+            <div class="client-type">Gouvernements & Agences</div>
+            <div class="client-desc">Ministères de l'Environnement (France, Australie, Indo-Pacifique), agences marines (IFREMER, NOAA, AIMS), collectivités des zones côtières.</div>
+        </div>
+        <div class="client-card">
+            <span class="client-icon">🌍</span>
+            <div class="client-type">ONG & Fondations</div>
+            <div class="client-desc">WWF, Reef Check, Coral Restoration Foundation, Oceana, The Nature Conservancy. Programmes EU Green Deal & Horizon Europe.</div>
+        </div>
+        <div class="client-card">
+            <span class="client-icon">🏢</span>
+            <div class="client-type">Entreprises Privées</div>
+            <div class="client-desc">Hôtellerie de luxe côtière (Four Seasons, Club Med), industries extractives avec obligations ESG, aquaculture et assureurs maritimes impact investing.</div>
+        </div>
+    </div>
+
+    <!-- Partners -->
+    <div style="margin-top:4rem;text-align:left" class="reveal">
+        <div class="section-label">Partenaires Clés</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;margin-top:2.5rem">
+            <div style="padding:2rem;background:linear-gradient(135deg, rgba(17,83,255,0.08), rgba(118,170,255,0.05));border:2px solid var(--blue-dark);border-radius:8px;">
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--blue-light);margin-bottom:0.8rem">Universités Marines</div>
+                <div style="font-size:0.95rem;color:var(--text-primary);line-height:1.7">Laboratoire COSMER · Partenariat R&D</div>
+            </div>
+            <div style="padding:2rem;background:linear-gradient(135deg, rgba(17,83,255,0.08), rgba(118,170,255,0.05));border:2px solid var(--blue-dark);border-radius:8px;">
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--blue-light);margin-bottom:0.8rem">Fournisseurs Robotique</div>
+                <div style="font-size:0.95rem;color:var(--text-primary);line-height:1.7">NVIDIA · Blue Robotics · Composants avancés</div>
+            </div>
+            <div style="padding:2rem;background:linear-gradient(135deg, rgba(255,195,60,0.08), rgba(236,224,167,0.05));border:2px solid var(--yellow);border-radius:8px;">
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--yellow);margin-bottom:0.8rem">ONG Conservation</div>
+                <div style="font-size:0.95rem;color:var(--text-primary);line-height:1.7">Coral Guardian · Protection des écosystèmes</div>
+            </div>
+            <div style="padding:2rem;background:linear-gradient(135deg, rgba(255,195,60,0.08), rgba(236,224,167,0.05));border:2px solid var(--yellow);border-radius:8px;">
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--yellow);margin-bottom:0.8rem">Assureurs Maritimes</div>
+                <div style="font-size:0.95rem;color:var(--text-primary);line-height:1.7">AXA XL Marine · Couverture impact</div>
+            </div>
+            <div style="padding:2rem;background:linear-gradient(135deg, rgba(118,170,255,0.08), rgba(17,83,255,0.05));border:2px solid var(--blue-light);border-radius:8px;">
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--blue-light);margin-bottom:0.8rem">Fabricants Matériaux</div>
+                <div style="font-size:0.95rem;color:var(--text-primary);line-height:1.7">Matériaux résistants · Structures durables</div>
+            </div>
+            <div style="padding:2rem;background:linear-gradient(135deg, rgba(118,170,255,0.08), rgba(17,83,255,0.05));border:2px solid var(--blue-light);border-radius:8px;">
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--blue-light);margin-bottom:0.8rem">Certification Environnement</div>
+                <div style="font-size:0.95rem;color:var(--text-primary);line-height:1.7">Bureau Veritas · Standards qualié</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="wave-divider"></div>
+
+<!-- CONTACT -->
+<section id="contact">
+    <div class="contact-inner reveal">
+        <div class="section-label" style="justify-content:center">Contact</div>
+        <h2 class="section-title" style="text-align:center">
+            Prêt à <strong>restaurer<br>les récifs</strong> ensemble ?
+        </h2>
+        <p class="section-body" style="text-align:center;margin:0 auto 0">
+            Gouvernements, ONG ou entreprises privées — discutons de la façon dont ReefBot peut répondre à vos enjeux environnementaux.
+        </p>
+
+        <div class="contact-info">
+            <div class="contact-item">
+                <span class="contact-item-label">Email</span>
+                <a href="mailto:contact@reefbot.fr" class="contact-item-val">contact@reefbot.fr</a>
+            </div>
+            <div class="contact-item">
+                <span class="contact-item-label">Site Web</span>
+                <a href="https://www.reefbot.fr" class="contact-item-val" target="_blank">www.reefbot.fr</a>
+            </div>
+            <div class="contact-item">
+                <span class="contact-item-label">LinkedIn</span>
+                <a href="#" class="contact-item-val">linkedin.com/company/reefbot</a>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+            <a href="mailto:contact@reefbot.fr" class="btn-primary">Prendre contact</a>
+            <a href="#services" class="btn-secondary">Voir nos offres</a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div>
+        <div class="footer-brand">REEF BOT</div>
+        <div class="footer-tagline">Restoring the ocean, one reef at a time.</div>
+    </div>
+
+    <div class="footer-sdgs">
+        <span style="font-size:0.65rem;color:var(--text-muted);margin-right:0.5rem">ODD</span>
+        <div class="sdg-badge" style="background:#3F7E44">13<br><span style="font-size:0.45rem">CLIMATE</span></div>
+        <div class="sdg-badge" style="background:#0A97D9">14<br><span style="font-size:0.45rem">BELOW WATER</span></div>
+        <div class="sdg-badge" style="background:#56C02B">15<br><span style="font-size:0.45rem">ON LAND</span></div>
+    </div>
+
+    <div class="footer-copy">
+        <div>Toulon, France · www.reefbot.fr</div>
+        <div style="margin-top:0.3rem">© 2026 ReefBot · La restauration des récifs par l'IA</div>
+    </div>
+</footer>
+
+<script>
+    // Tab switching
+    function showTab(id, event) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + id).classList.add('active');
+        if (event && event.currentTarget) event.currentTarget.classList.add('active');
+    }
+
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) e.target.classList.add('visible');
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Smooth active nav
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(s => {
+            if (window.scrollY >= s.offsetTop - 120) current = s.getAttribute('id');
+        });
+        navLinks.forEach(a => {
+            a.style.color = a.getAttribute('href') === '#' + current ? 'var(--yellow)' : '';
+        });
+    });
+</script>
+</body>
+</html>
